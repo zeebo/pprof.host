@@ -230,10 +230,18 @@ func (p *flagset) Parse(usage func()) []string {
 
 func redactSource(p *profile.Profile) {
 	redactLocations(p.Location)
-	for _, sample := range p.Sample {
-		redactLocations(sample.Location)
-	}
+	redactSamples(p.Sample)
 	redactFunctions(p.Function)
+}
+
+func redactSamples(ss []*profile.Sample) {
+	for _, s := range ss {
+		redactSample(s)
+	}
+}
+
+func redactSample(s *profile.Sample) {
+	redactLocations(s.Location)
 }
 
 func redactLocations(locs []*profile.Location) {
@@ -243,6 +251,7 @@ func redactLocations(locs []*profile.Location) {
 }
 
 func redactLocation(loc *profile.Location) {
+	loc.Address = 0
 	for i := range loc.Line {
 		redactLine(&loc.Line[i])
 	}
