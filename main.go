@@ -103,6 +103,9 @@ func (h createHandler) serveHTTP(rw http.ResponseWriter, req *http.Request) erro
 		if err != nil {
 			return errs.Wrap(err)
 		}
+		if _, err := profile.ParseData(data); err != nil {
+			return errs.Wrap(err)
+		}
 		name, err := h.store.Save(req.Context(), data)
 		if err != nil {
 			return errs.Wrap(err)
