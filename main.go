@@ -149,6 +149,7 @@ func (h uiHandler) serveHTTP(rw http.ResponseWriter, req *http.Request) error {
 	fmt.Fprintln(rw, `  <input type="submit" value="Upload">`)
 	fmt.Fprintln(rw, `</form>`)
 	fmt.Fprintln(rw, "<p>command line: <tt>curl -F profile=@&lt;filename&gt; https://pprof.host</tt></p>")
+	fmt.Fprintln(rw, `<p><a href="https://github.com/zeebo/pprof.host">pull requests welcome</a></p>`)
 	return nil
 }
 
@@ -183,7 +184,7 @@ func (h pprofHandler) serveHTTP(rw http.ResponseWriter, req *http.Request) error
 	return errs.Wrap(driver.PProf(&driver.Options{
 		Flagset: &flagset{args: []string{
 			"--http", "localhost:0",
-			"--symbolizer", "none",
+			"--symbolize", "none",
 		}},
 		UI:         nullUI{},
 		Fetch:      (*fetcherProfile)(p),
