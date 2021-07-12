@@ -1,3 +1,4 @@
 /pprof.host
 /certs
 /profiles.db*
+/vendor

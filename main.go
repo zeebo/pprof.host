@@ -173,6 +173,7 @@ func (h pprofHandler) serveHTTP(rw http.ResponseWriter, req *http.Request) error
 	if err != nil {
 		return errs.Wrap(err)
 	}
+	redactSource(p)
 
 	server := func(args *driver.HTTPServerArgs) error {
 		args.Handlers["*"] = http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
@@ -185,6 +186,7 @@ func (h pprofHandler) serveHTTP(rw http.ResponseWriter, req *http.Request) error
 		Flagset: &flagset{args: []string{
 			"--http", "localhost:0",
 			"--symbolize", "none",
+			"--source_path", "/dev/null",
 		}},
 		UI:         nullUI{},
 		Fetch:      (*fetcherProfile)(p),
@@ -221,4 +223,39 @@ func (p *flagset) StringList(name string, def string, usage string) *[]*string {
 func (p *flagset) Parse(usage func()) []string {
 	_ = p.FlagSet.Parse(p.args)
 	return []string{""}
+}
+
+func redactSource(p *profile.Profile) {
+	redactLocations(p.Location)
+	for _, sample := range p.Sample {
+		redactLocations(sample.Location)
+	}
+	redactFunctions(p.Function)
+}
+
+func redactLocations(locs []*profile.Location) {
+	for _, loc := range locs {
+		redactLocation(loc)
+	}
+}
+
+func redactLocation(loc *profile.Location) {
+	for i := range loc.Line {
+		redactLine(&loc.Line[i])
+	}
+}
+
+func redactLine(line *profile.Line) {
+	line.Line = 0
+	redactFunction(line.Function)
+}
+
+func redactFunctions(fns []*profile.Function) {
+	for _, fn := range fns {
+		redactFunction(fn)
+	}
+}
+
+func redactFunction(fn *profile.Function) {
+	fn.Filename = ""
 }
