@@ -36,7 +36,7 @@ func (h createHandler) serveHTTP(rw http.ResponseWriter, req *http.Request) erro
 		if part.FormName() != "profile" {
 			continue
 		}
-		rc := http.MaxBytesReader(rw, part, 1<<20)
+		rc := http.MaxBytesReader(rw, part, 2<<20)
 		data, err := io.ReadAll(rc)
 		rc.Close()
 		if err != nil {
