@@ -67,13 +67,13 @@ func run(ctx context.Context) error {
 	defer lis443.Close()
 	defer lis80.Close()
 
+	tlsConfig := certManager.TLSConfig()
+	tlsConfig.MinVersion = tls.VersionTLS12
+	tlsConfig.SessionTicketsDisabled = true
+
 	srv := &http.Server{
-		Handler: handler,
-		TLSConfig: &tls.Config{
-			MinVersion:             tls.VersionTLS12,
-			SessionTicketsDisabled: true,
-			GetCertificate:         certManager.GetCertificate,
-		},
+		Handler:   handler,
+		TLSConfig: tlsConfig,
 	}
 
 	go func() { panic(srv.ServeTLS(lis443, "", "")) }()
